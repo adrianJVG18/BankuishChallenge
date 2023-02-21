@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.adrian.bankuishcodechallenge.domain.use_case.FetchRepositoriesUsecase
 import com.adrian.bankuishcodechallenge.adapter.Output
+import com.adrian.bankuishcodechallenge.adapter.model.RepositoryUi
+import com.adrian.bankuishcodechallenge.adapter.model.toUiModel
 import com.adrian.bankuishcodechallenge.data.repository.Response
 import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,23 +22,23 @@ class RepositoriesViewmodel @Inject constructor(
     private val fetchRepositoriesUsecase: FetchRepositoriesUsecase
 ) :ViewModel() {
 
-    private val _repositories = MutableLiveData<Output<List<RepositoryDto>>>(Output.Loading(false))
-    val repositories: LiveData<Output<List<RepositoryDto>>> = _repositories
+    private val _repositories = MutableLiveData<Output<List<RepositoryUi>>>(Output.Loading(false))
+    val repositories: LiveData<Output<List<RepositoryUi>>> = _repositories
 
     fun fetchRepositories() {
         viewModelScope.launch {
             _repositories.postValue(Output.Loading(true))
-            fetchRepositoriesUsecase.execute().collect {
-                when (it) {
+            fetchRepositoriesUsecase.execute().collect { response ->
+                when (response) {
                     is Response.Success -> {
-                        _repositories.postValue(Output.Success(it.data))
+                        _repositories.postValue(Output.Success(response.data.map {
+                            it.toUiModel()
+                        }))
                     }
                     is Response.Failure -> {
-                        _repositories.postValue(Output.Failure(it.errorMessage))
+                        _repositories.postValue(Output.Failure(response.errorMessage))
                     }
-                    else -> {
-                        // While waiting the request
-                    }
+                    else -> { }
                 }
             }
         }

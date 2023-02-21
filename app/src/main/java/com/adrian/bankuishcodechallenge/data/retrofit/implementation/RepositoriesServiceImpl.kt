@@ -3,7 +3,6 @@ package com.adrian.bankuishcodechallenge.data.retrofit.implementation
 import com.adrian.bankuishcodechallenge.data.repository.RepositoryApi
 import com.adrian.bankuishcodechallenge.data.repository.Response
 import com.adrian.bankuishcodechallenge.data.retrofit.service.RepositoriesService
-import com.adrian.bankuishcodechallenge.domain.use_case.dto.toDto
 import com.adrian.bankuishcodechallenge.entities.RepositoriesResponse
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,17 +1,17 @@
 package com.adrian.bankuishcodechallenge.domain.use_case
 
+import androidx.compose.ui.text.toLowerCase
 import com.adrian.bankuishcodechallenge.data.repository.RepositoryApi
 import com.adrian.bankuishcodechallenge.data.repository.Response
 import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
-import com.adrian.bankuishcodechallenge.domain.use_case.dto.toDto
-import dagger.Binds
+import com.adrian.bankuishcodechallenge.data.repository.toDto
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.util.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -22,7 +22,7 @@ class FetchRepositoriesUsecase @Inject constructor(
 ) : FlowUsecase<Int, Response<List<RepositoryDto>>>() {
 
     companion object {
-        const val QUERY_PARAM = "kotlin"
+        const val QUERY_PARAM = "language:Kotlin"
         const val PER_PAGE_PARAM = 20
     }
 
@@ -30,14 +30,13 @@ class FetchRepositoriesUsecase @Inject constructor(
         repositoriesApi.getRepositories(QUERY_PARAM, PER_PAGE_PARAM, params ?: 1).collect { response ->
             when (response) {
                 is Response.Success -> {
-                    emit(Response.Success(response.data.items.map { it.toDto() }))
+                    emit(Response.Success(response.data.items
+                        .map { it.toDto() }))
                 }
                 is Response.Failure -> {
                     emit(Response.Failure(response.errorMessage))
                 }
-                else -> {
-                    // Waiting code
-                }
+                else -> { }
             }
         }
 

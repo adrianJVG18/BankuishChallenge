@@ -4,11 +4,14 @@ buildscript {
         hilt_version = '2.38.1'
     }
     repositories {
-        // redacted
+        google()
     }
     dependencies {
+        def nav_version = "2.5.3"
+
         // redacted
         classpath "com.google.dagger:hilt-android-gradle-plugin:${hilt_version}"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
     }
 }
 

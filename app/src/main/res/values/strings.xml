@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">BankuishCodeChallenge</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_state_when_request_failed">error state when request failed</string>
+    <string name="repositorys_owner_avatar">repository´s owner avatar</string>
+    <string name="created_at">Created at</string>
+    <string name="updated_at">Updated at</string>
+    <string name="watchers">Watchers:</string>
+    <string name="issues">Issues:</string>
 </resources>
