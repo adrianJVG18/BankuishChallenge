@@ -2,6 +2,7 @@ package com.adrian.bankuishcodechallenge.adapter.viewmodels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.adrian.bankuishcodechallenge.adapter.Output
+import com.adrian.bankuishcodechallenge.adapter.model.toUiModel
 import com.adrian.bankuishcodechallenge.data.repository.Response
 import com.adrian.bankuishcodechallenge.domain.use_case.FetchRepositoriesUsecase
 import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
@@ -24,8 +25,8 @@ import org.mockito.junit.MockitoJUnitRunner
 class RepositoriesViewmodelTest {
 
     companion object {
-        private val REPOSITORY_1 = RepositoryDto("project 1", "alfa")
-        private val REPOSITORY_2 = RepositoryDto("project 2", "beta")
+        private val REPOSITORY_1 = RepositoryDto(name = "project 1", author =  "alfa")
+        private val REPOSITORY_2 = RepositoryDto(name = "project 2", author =  "beta")
         private val REPOSITORIES = arrayListOf(
             REPOSITORY_1,
             REPOSITORY_2
@@ -71,7 +72,7 @@ class RepositoriesViewmodelTest {
                     .`when`(fetchRepositoriesUsecase).execute()
 
                 viewmodel.fetchRepositories()
-                assert(viewmodel.repositories.value == Output.Success(REPOSITORIES))
+                assert(viewmodel.repositories.value == Output.Success(REPOSITORIES.map { it.toUiModel() }))
             }
         }
 

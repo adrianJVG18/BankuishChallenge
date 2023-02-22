@@ -5,6 +5,7 @@ import com.adrian.bankuishcodechallenge.data.repository.RepositoryApi
 import com.adrian.bankuishcodechallenge.data.repository.Response
 import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
 import com.adrian.bankuishcodechallenge.data.repository.toDto
+import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoriesResponseDto
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
@@ -19,19 +20,18 @@ import javax.inject.Inject
 @InstallIn(ViewModelComponent::class)
 class FetchRepositoriesUsecase @Inject constructor(
     private val repositoriesApi: RepositoryApi
-) : FlowUsecase<Int, Response<List<RepositoryDto>>>() {
+) : FlowUsecase<Int, Response<RepositoriesResponseDto>>() {
 
     companion object {
         const val QUERY_PARAM = "language:Kotlin"
         const val PER_PAGE_PARAM = 20
     }
 
-    override suspend fun execute(params: Int?): Flow<Response<List<RepositoryDto>>> = flow {
+    override suspend fun execute(params: Int?): Flow<Response<RepositoriesResponseDto>> = flow {
         repositoriesApi.getRepositories(QUERY_PARAM, PER_PAGE_PARAM, params ?: 1).collect { response ->
             when (response) {
                 is Response.Success -> {
-                    emit(Response.Success(response.data.items
-                        .map { it.toDto() }))
+                    emit(Response.Success(response.data.toDto()))
                 }
                 is Response.Failure -> {
                     emit(Response.Failure(response.errorMessage))

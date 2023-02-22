@@ -12,3 +12,6 @@ fun String.formatTo(format: String) : String {
     val odt = OffsetDateTime.parse(this, formatter)
     return odt.toString()
 }
+
+val CharSequence.asInt: Int
+    get() = this.toString().toInt()

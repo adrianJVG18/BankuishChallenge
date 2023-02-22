@@ -1,9 +1,8 @@
 package com.adrian.bankuishcodechallenge.framework.view.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -14,6 +13,8 @@ import com.adrian.bankuishcodechallenge.adapter.model.RepositoryUi
 import com.adrian.bankuishcodechallenge.adapter.viewmodels.RepositoriesViewmodel
 import com.adrian.bankuishcodechallenge.databinding.FragmentRepositoriesV2Binding
 import com.adrian.bankuishcodechallenge.framework.adapters.RepositoriesAdapter
+import com.adrian.bankuishcodechallenge.framework.utils.asInt
+import com.adrian.bankuishcodechallenge.framework.utils.toDp
 import com.adrian.bankuishcodechallenge.framework.utils.viewBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -24,7 +25,7 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
     private val binding: FragmentRepositoriesV2Binding by viewBinding(FragmentRepositoriesV2Binding::bind)
     private lateinit var navController: NavController
     private val adapter: RepositoriesAdapter by lazy {
-        RepositoriesAdapter(mutableListOf(), itemClickListener)
+        RepositoriesAdapter(mutableListOf(), itemClickListener, onBottomReached)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,6 +41,31 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
         binding.repositoriesRecyclerView.layoutManager = LinearLayoutManager(context).apply {
             orientation = LinearLayoutManager.VERTICAL
         }
+        with(binding.currentPageText) {
+            text = (1).toString()
+            binding.errorStateImageview.setOnClickListener {
+                refreshRepositories(text.asInt)
+            }
+            binding.errorStateText.setOnClickListener {
+                refreshRepositories(text.asInt)
+            }
+            binding.swipeRefresh.setOnRefreshListener {
+                refreshRepositories(text.asInt)
+            }
+            binding.previousPageImageButton.setOnClickListener {
+                if (text.asInt > 1) {
+                    val decreasedPage = text.asInt - 1
+                    text = decreasedPage.toString()
+                    viewmodel.fetchRepositories(decreasedPage)
+                }
+            }
+            binding.followingPageImageView.setOnClickListener {
+                val increasedPage: Int = text.asInt + 1
+                text = increasedPage.toString()
+                viewmodel.fetchRepositories(increasedPage)
+            }
+        }
+
     }
 
     private fun observeData() {
@@ -47,27 +73,37 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
             when (result) {
                 is Output.Success -> {
                     handleState(true)
-                    toast("Obtained ${result.data.size} items")
-                    // TODO should be submit (uses DiffUtils), not update (uses notifyDataSetChanged()) but somehow submit isn't working
-                    // adapter.submitList(result.data)
+                    binding.swipeRefresh.isRefreshing = false
                     adapter.updateList(result.data)
+                    binding.repositoriesRecyclerView.scrollToPosition(0)
                 }
                 is Output.Failure -> {
-                    toast("Failed to fetch Repositories: ${result.errorMessage}")
+                    binding.swipeRefresh.isRefreshing = false
                     handleState(false)
                 }
-                else -> {}
+                else -> {
+                    if (result is Output.Loading && result.isLoading) {
+                        binding.repositoriesRecyclerView.visibility = View.GONE
+                        binding.errorStateViewGroup.visibility = View.GONE
+                    }
+                }
+            }
+        }
+        viewmodel.totalRepositories.observe(viewLifecycleOwner) {
+            viewmodel.totalRepositories.value?.let {
+                val text = " / ${it.div(20)}"
+                binding.maxPageTextView.text = text
             }
         }
     }
 
     private fun handleState(isSuccess: Boolean) {
         binding.repositoriesRecyclerView.visibility = if (isSuccess) View.VISIBLE else View.GONE
-        binding.errorStateImageview.visibility = if (isSuccess) View.GONE else View.VISIBLE
+        binding.errorStateViewGroup.visibility = if (isSuccess) View.GONE else View.VISIBLE
     }
 
-    private fun toast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    private fun refreshRepositories(currentPage: Int? = 1) {
+        viewmodel.fetchRepositories(currentPage)
     }
 
     private val itemClickListener = object : RepositoriesAdapter.OnItemClickListener {
@@ -77,5 +113,28 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
                 item.toBundle()
             )
         }
+    }
+
+    private val onBottomReached = object : RepositoriesAdapter.OnBottomReachedListener {
+        override fun onBottomReached(isAtBottom: Boolean) {
+            with(binding.pagingControlsLinearLayout) {
+                if (isAtBottom) {
+                    visibility = View.VISIBLE
+                    animate()
+                        .setDuration(500)
+                        .translationY(0f)
+                } else {
+                    animate()
+                        .setDuration(500)
+                        .translationY(this.height.toDp().toFloat())
+                        .withEndAction {
+                            visibility = View.GONE
+                        }
+
+                }
+            }
+
+        }
+
     }
 }

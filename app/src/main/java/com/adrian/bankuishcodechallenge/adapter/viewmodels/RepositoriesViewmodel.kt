@@ -20,25 +20,29 @@ import javax.inject.Inject
 @HiltViewModel
 class RepositoriesViewmodel @Inject constructor(
     private val fetchRepositoriesUsecase: FetchRepositoriesUsecase
-) :ViewModel() {
+) : ViewModel() {
 
     private val _repositories = MutableLiveData<Output<List<RepositoryUi>>>(Output.Loading(false))
     val repositories: LiveData<Output<List<RepositoryUi>>> = _repositories
 
-    fun fetchRepositories() {
+    private val _totalRepositories = MutableLiveData(0)
+    val totalRepositories: LiveData<Int> = _totalRepositories
+
+    fun fetchRepositories(currentPage: Int? = 1) {
         viewModelScope.launch {
             _repositories.postValue(Output.Loading(true))
-            fetchRepositoriesUsecase.execute().collect { response ->
+            fetchRepositoriesUsecase.execute(currentPage).collect { response ->
                 when (response) {
                     is Response.Success -> {
-                        _repositories.postValue(Output.Success(response.data.map {
+                        _repositories.postValue(Output.Success(response.data.items.map {
                             it.toUiModel()
                         }))
+                        _totalRepositories.postValue(response.data.count)
                     }
                     is Response.Failure -> {
                         _repositories.postValue(Output.Failure(response.errorMessage))
                     }
-                    else -> { }
+                    else -> {}
                 }
             }
         }

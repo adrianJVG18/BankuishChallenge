@@ -8,4 +8,7 @@
     <string name="updated_at">Updated at</string>
     <string name="watchers">Watchers:</string>
     <string name="issues">Issues:</string>
+    <string name="repositories_failed_to_fetch_text">Error al intentar obtener repositorios, intenta de nuevo haciendo click o deslizando hacia abajo</string>
+    <string name="image_button_to_load_previous_page">Image Button to load previous page</string>
+    <string name="image_button_to_load_following_page">image button to load following page</string>
 </resources>
