@@ -9,11 +9,9 @@ import com.adrian.bankuishcodechallenge.adapter.Output
 import com.adrian.bankuishcodechallenge.adapter.model.RepositoryUi
 import com.adrian.bankuishcodechallenge.adapter.model.toUiModel
 import com.adrian.bankuishcodechallenge.data.repository.Response
-import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
 import com.adrian.bankuishcodechallenge.domain.use_case.dto.RequestRepositoriesDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
