@@ -1,25 +1,35 @@
 package com.adrian.bankuishcodechallenge.framework.adapters
 
+import android.content.res.Resources.getSystem
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.adrian.bankuishcodechallenge.R
 import com.adrian.bankuishcodechallenge.adapter.model.RepositoryUi
 import com.adrian.bankuishcodechallenge.databinding.ItemSimpleRepositoryBinding
+import com.adrian.bankuishcodechallenge.framework.utils.toDp
 import com.squareup.picasso.Picasso
 
 class RepositoriesAdapter(
     private var items: MutableList<RepositoryUi>,
-    private val onItemClickListener: OnItemClickListener
-): RecyclerView.Adapter<RepositoryViewHolder>()  {
+    private val onItemClickListener: OnItemClickListener,
+    private val onBottomReachedListener: OnBottomReachedListener
+) : RecyclerView.Adapter<RepositoryViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(item: RepositoryUi)
     }
 
+    interface OnBottomReachedListener {
+        fun onBottomReached(isAtBottom: Boolean)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryViewHolder {
-        val binding = ItemSimpleRepositoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemSimpleRepositoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RepositoryViewHolder(binding)
     }
 
@@ -27,13 +37,27 @@ class RepositoriesAdapter(
 
     override fun onBindViewHolder(holder: RepositoryViewHolder, position: Int) {
         holder.bind(items[position], onItemClickListener)
+        // It is the last item of the list
+        if (position + 1 == itemCount) {
+            // Set bottom margin to 72dp
+            setBottomMargin(
+                holder.itemView, (60).toDp()
+            );
+            onBottomReachedListener.onBottomReached(true)
+        } else {
+            // Reset bottom margin back to zero
+            setBottomMargin(holder.itemView, 0);
+            onBottomReachedListener.onBottomReached(false)
+        }
     }
 
+    // TODO make it work to replace updateList
     fun submitList(newList: List<RepositoryUi>) {
         val diffResult = DiffUtil.calculateDiff(Diff(this.items, newList))
         diffResult.dispatchUpdatesTo(this)
     }
 
+    // TODO should be submit (uses DiffUtils) to avoid notifyDataSetChanged()) but somehow submit isn't working
     fun updateList(newList: List<RepositoryUi>) {
         items.run {
             clear()
@@ -57,6 +81,20 @@ class RepositoriesAdapter(
     val differ = AsyncListDiffer(this,differCallback)
      */
 
+    companion object {
+        private fun setBottomMargin(view: View, bottomMargin: Int) {
+            if (view.layoutParams is MarginLayoutParams) {
+                val params = view.layoutParams as MarginLayoutParams
+                params.setMargins(
+                    params.leftMargin,
+                    params.topMargin,
+                    params.rightMargin,
+                    bottomMargin
+                )
+                view.requestLayout()
+            }
+        }
+    }
 }
 
 class RepositoryViewHolder(

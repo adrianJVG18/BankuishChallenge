@@ -1,10 +1,10 @@
 package com.adrian.bankuishcodechallenge.domain.use_case
 
-import androidx.compose.ui.text.toLowerCase
 import com.adrian.bankuishcodechallenge.data.repository.RepositoryApi
 import com.adrian.bankuishcodechallenge.data.repository.Response
-import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
 import com.adrian.bankuishcodechallenge.data.repository.toDto
+import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoriesResponseDto
+import com.adrian.bankuishcodechallenge.domain.use_case.dto.RequestRepositoriesDto
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
@@ -19,26 +19,36 @@ import javax.inject.Inject
 @InstallIn(ViewModelComponent::class)
 class FetchRepositoriesUsecase @Inject constructor(
     private val repositoriesApi: RepositoryApi
-) : FlowUsecase<Int, Response<List<RepositoryDto>>>() {
+) : FlowUsecase<RequestRepositoriesDto, Response<RepositoriesResponseDto>>() {
 
     companion object {
-        const val QUERY_PARAM = "language:Kotlin"
+        const val DEFAULT_QUERY_PARAM = "language:Kotlin"
         const val PER_PAGE_PARAM = 20
+        const val DEFAULT_CURRENT_PAGE = 1
     }
 
-    override suspend fun execute(params: Int?): Flow<Response<List<RepositoryDto>>> = flow {
-        repositoriesApi.getRepositories(QUERY_PARAM, PER_PAGE_PARAM, params ?: 1).collect { response ->
+    override suspend fun execute(params: RequestRepositoriesDto?):
+            Flow<Response<RepositoriesResponseDto>> = flow {
+
+        repositoriesApi.getRepositories(
+            query = getQueryParam(params?.query),
+            perPage = PER_PAGE_PARAM,
+            page = params?.page ?: DEFAULT_CURRENT_PAGE
+        ).collect { response ->
             when (response) {
                 is Response.Success -> {
-                    emit(Response.Success(response.data.items
-                        .map { it.toDto() }))
+                    emit(Response.Success(response.data.toDto()))
                 }
                 is Response.Failure -> {
                     emit(Response.Failure(response.errorMessage))
                 }
-                else -> { }
+                else -> {}
             }
         }
+    }
 
+    private fun getQueryParam(query: String? = ""): String {
+        if (query.isNullOrBlank()) return DEFAULT_QUERY_PARAM
+        return query
     }
 }

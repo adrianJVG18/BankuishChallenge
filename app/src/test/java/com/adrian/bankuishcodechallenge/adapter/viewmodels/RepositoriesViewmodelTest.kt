@@ -2,8 +2,10 @@ package com.adrian.bankuishcodechallenge.adapter.viewmodels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.adrian.bankuishcodechallenge.adapter.Output
+import com.adrian.bankuishcodechallenge.adapter.model.toUiModel
 import com.adrian.bankuishcodechallenge.data.repository.Response
 import com.adrian.bankuishcodechallenge.domain.use_case.FetchRepositoriesUsecase
+import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoriesResponseDto
 import com.adrian.bankuishcodechallenge.domain.use_case.dto.RepositoryDto
 import com.adrian.bankuishcodechallenge.utils.TestCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,8 +26,8 @@ import org.mockito.junit.MockitoJUnitRunner
 class RepositoriesViewmodelTest {
 
     companion object {
-        private val REPOSITORY_1 = RepositoryDto("project 1", "alfa")
-        private val REPOSITORY_2 = RepositoryDto("project 2", "beta")
+        private val REPOSITORY_1 = RepositoryDto(name = "project 1", author =  "alfa")
+        private val REPOSITORY_2 = RepositoryDto(name = "project 2", author =  "beta")
         private val REPOSITORIES = arrayListOf(
             REPOSITORY_1,
             REPOSITORY_2
@@ -56,7 +58,7 @@ class RepositoriesViewmodelTest {
     fun `when fetchRepositories then fetchRepositoriesUsecase is executed`() = runTest {
         testCoroutineRule.runBlockingTest {
             viewmodel.fetchRepositories()
-            verify(fetchRepositoriesUsecase).execute()
+            verify(fetchRepositoriesUsecase).execute(any())
         }
     }
 
@@ -64,14 +66,15 @@ class RepositoriesViewmodelTest {
     fun `when fetchRepositories and fetchRepositoriesUsecase succeeds then emit list of RepositoriesDto`() =
         runTest {
             testCoroutineRule.runBlockingTest {
-                val flowable = flow<Response<List<RepositoryDto>>> {
-                    emit(Response.Success(REPOSITORIES))
+                val responseDto = RepositoriesResponseDto(2,false, REPOSITORIES)
+                val flowable = flow<Response<RepositoriesResponseDto>> {
+                    emit(Response.Success(responseDto))
                 }
                 doReturn(flowable)
-                    .`when`(fetchRepositoriesUsecase).execute()
+                    .`when`(fetchRepositoriesUsecase).execute(any())
 
                 viewmodel.fetchRepositories()
-                assert(viewmodel.repositories.value == Output.Success(REPOSITORIES))
+                assert(viewmodel.repositories.value == Output.Success(REPOSITORIES.map { it.toUiModel() }))
             }
         }
 
@@ -79,11 +82,11 @@ class RepositoriesViewmodelTest {
     fun `when fetchRepositories and fetchRepositoriesUsecase fails then emit errorMessage`() =
         runTest {
             testCoroutineRule.runBlockingTest {
-                val flowable = flow<Response<List<RepositoryDto>>> {
+                val flowable = flow<Response<RepositoriesResponseDto>> {
                     emit(Response.Failure(ERROR_MESSAGE))
                 }
                 doReturn(flowable)
-                    .`when`(fetchRepositoriesUsecase).execute()
+                    .`when`(fetchRepositoriesUsecase).execute(any())
 
                 viewmodel.fetchRepositories()
                 assert(viewmodel.repositories.value is Output.Failure)

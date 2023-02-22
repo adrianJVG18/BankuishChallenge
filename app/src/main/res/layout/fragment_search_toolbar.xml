@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.adrian.bankuishcodechallenge.adapter.viewmodels.RepositoriesViewmodel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/search_toolbar_height"
+        android:background="@color/purple_500">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_edit_text_card"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/search_edit_text_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="24dp"
+            android:background="@color/white"
+            app:cardCornerRadius="@dimen/search_edit_text_corner_radius"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/search_edit_text_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/search_edit_text"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:text="@={viewmodel.query}"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/buscar_repositorios_en_github"
+                    android:layout_marginHorizontal="8dp"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textSize="18sp"
+                    android:gravity="center_vertical"
+                    android:paddingStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/search_edit_text_background"
+                    app:layout_constraintEnd_toEndOf="@id/search_edit_text_background"
+                    app:layout_constraintStart_toEndOf="@id/search_icon"
+                    app:layout_constraintTop_toTopOf="@id/search_edit_text_background" />
+
+                <ImageView
+                    android:id="@+id/search_icon"
+                    android:layout_width="@dimen/search_icon_size"
+                    android:layout_height="@dimen/search_icon_size"
+                    android:src="@drawable/ic_baseline_search_24"
+                    app:layout_constraintBottom_toBottomOf="@id/search_edit_text_background"
+                    app:layout_constraintTop_toTopOf="@id/search_edit_text_background"
+                    app:layout_constraintStart_toStartOf="@id/search_edit_text_background"
+                    android:layout_marginHorizontal="8dp"
+                    android:contentDescription="@string/search_icon_drawable" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
