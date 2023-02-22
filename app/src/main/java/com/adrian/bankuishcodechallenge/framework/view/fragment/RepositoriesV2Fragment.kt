@@ -1,7 +1,9 @@
 package com.adrian.bankuishcodechallenge.framework.view.fragment
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
@@ -14,6 +16,7 @@ import com.adrian.bankuishcodechallenge.adapter.viewmodels.RepositoriesViewmodel
 import com.adrian.bankuishcodechallenge.databinding.FragmentRepositoriesV2Binding
 import com.adrian.bankuishcodechallenge.framework.adapters.RepositoriesAdapter
 import com.adrian.bankuishcodechallenge.framework.utils.asInt
+import com.adrian.bankuishcodechallenge.framework.utils.hideKeyboard
 import com.adrian.bankuishcodechallenge.framework.utils.toDp
 import com.adrian.bankuishcodechallenge.framework.utils.viewBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +40,8 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
     }
 
     private fun setUpViews() {
+        binding.searchToolbarHost.viewmodel = this.viewmodel
+        binding.searchToolbarHost.lifecycleOwner = this
         binding.repositoriesRecyclerView.adapter = adapter
         binding.repositoriesRecyclerView.layoutManager = LinearLayoutManager(context).apply {
             orientation = LinearLayoutManager.VERTICAL
@@ -64,6 +69,15 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
                 text = increasedPage.toString()
                 viewmodel.fetchRepositories(increasedPage)
             }
+        }
+        binding.searchToolbarHost.searchEditText.setOnEditorActionListener { _, keyCode, event ->
+            if (((event?.action ?: -1) == KeyEvent.ACTION_DOWN) || keyCode == EditorInfo.IME_ACTION_SEARCH
+            ) {
+                binding.searchToolbarHost.searchEditText.hideKeyboard()
+                viewmodel.fetchRepositories()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
         }
 
     }
@@ -133,8 +147,6 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
 
                 }
             }
-
         }
-
     }
 }

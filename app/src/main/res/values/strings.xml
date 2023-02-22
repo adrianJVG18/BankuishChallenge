@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">BankuishCodeChallenge</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="error_state_when_request_failed">error state when request failed</string>
     <string name="repositorys_owner_avatar">repository´s owner avatar</string>
     <string name="created_at">Created at</string>
@@ -11,4 +10,7 @@
     <string name="repositories_failed_to_fetch_text">Error al intentar obtener repositorios, intenta de nuevo haciendo click o deslizando hacia abajo</string>
     <string name="image_button_to_load_previous_page">Image Button to load previous page</string>
     <string name="image_button_to_load_following_page">image button to load following page</string>
+    <string name="buscar_repositorios_en_github">Buscar repositorios en Github</string>
+    <string name="search_icon_drawable">Search icon drawable</string>
+
 </resources>
