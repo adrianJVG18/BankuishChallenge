@@ -94,4 +94,25 @@ class RepositoriesViewmodelTest {
             }
         }
 
+    @Test
+    fun `when fetchRepositories executed and request succeeds but gets an empty list of repositories, totalRepositories emits 0`() =
+        runTest {
+            testCoroutineRule.runBlockingTest {
+                val emptyResponse = RepositoriesResponseDto(
+                    count = 0,
+                    incompleteResults = false,
+                    items = emptyList()
+                )
+                val flowable = flow<Response<RepositoriesResponseDto>> {
+                    emit(Response.Success(emptyResponse))
+                }
+                doReturn(flowable)
+                    .`when`(fetchRepositoriesUsecase).execute(any())
+
+                viewmodel.fetchRepositories()
+                assert(viewmodel.repositories.value is Output.Success)
+                assert(viewmodel.totalRepositories.value == 0)
+            }
+        }
+
 }
