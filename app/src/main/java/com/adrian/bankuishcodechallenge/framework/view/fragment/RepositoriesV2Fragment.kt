@@ -40,23 +40,32 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
     }
 
     private fun setUpViews() {
+        // Set up toolbar
         binding.searchToolbarHost.viewmodel = this.viewmodel
         binding.searchToolbarHost.lifecycleOwner = this
+
+        // Set up recycler list
         binding.repositoriesRecyclerView.adapter = adapter
         binding.repositoriesRecyclerView.layoutManager = LinearLayoutManager(context).apply {
             orientation = LinearLayoutManager.VERTICAL
         }
+
         with(binding.currentPageText) {
             text = (1).toString()
+
+            // Set up failed state action
             binding.errorStateImageview.setOnClickListener {
                 refreshRepositories(text.asInt)
             }
+            // Set up failed state action
             binding.errorStateText.setOnClickListener {
                 refreshRepositories(text.asInt)
             }
+            // Set up swipe to refresh action
             binding.swipeRefresh.setOnRefreshListener {
                 refreshRepositories(text.asInt)
             }
+            // Previous page button
             binding.previousPageImageButton.setOnClickListener {
                 if (text.asInt > 1) {
                     val decreasedPage = text.asInt - 1
@@ -64,6 +73,7 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
                     viewmodel.fetchRepositories(decreasedPage)
                 }
             }
+            // Following page action
             binding.followingPageImageView.setOnClickListener {
                 val increasedPage: Int = text.asInt + 1
                 text = increasedPage.toString()
@@ -71,7 +81,9 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
             }
         }
         binding.searchToolbarHost.searchEditText.setOnEditorActionListener { _, keyCode, event ->
-            if (((event?.action ?: -1) == KeyEvent.ACTION_DOWN) || keyCode == EditorInfo.IME_ACTION_SEARCH
+            // If "enter" key is pressed, do something (hide soft keyboard and trigger a search)
+            if (((event?.action
+                    ?: -1) == KeyEvent.ACTION_DOWN) || keyCode == EditorInfo.IME_ACTION_SEARCH
             ) {
                 binding.searchToolbarHost.searchEditText.hideKeyboard()
                 viewmodel.fetchRepositories()
@@ -86,6 +98,7 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
         viewmodel.repositories.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Output.Success -> {
+
                     handleState(true)
                     binding.swipeRefresh.isRefreshing = false
                     adapter.updateList(result.data)
@@ -104,7 +117,10 @@ class RepositoriesV2Fragment : Fragment(R.layout.fragment_repositories_v2) {
             }
         }
         viewmodel.totalRepositories.observe(viewLifecycleOwner) {
-            viewmodel.totalRepositories.value?.let {
+            if (it == 0) {
+                binding.noResultsStateViewGroup.visibility = View.VISIBLE
+            } else {
+                binding.noResultsStateViewGroup.visibility = View.GONE
                 val text = " / ${it.div(20)}"
                 binding.maxPageTextView.text = text
             }

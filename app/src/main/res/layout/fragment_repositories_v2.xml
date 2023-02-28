@@ -121,6 +121,37 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/error_state_imageview" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/no_results_state_view_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:constraint_referenced_ids="no_results_state_imageview, no_results_state_text" />
+
+            <ImageView
+                android:id="@+id/no_results_state_imageview"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="@string/no_results_state_when_request_failed"
+                android:src="@drawable/baseline_question_mark_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/no_results_state_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="48dp"
+                android:gravity="center_horizontal"
+                android:text="@string/repositories_not_found_text"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/no_results_state_imageview" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
